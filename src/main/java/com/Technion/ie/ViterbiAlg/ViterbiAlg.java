@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.Technion.ie.dao.Feature;
 import com.Technion.ie.dao.History;
 import com.Technion.ie.dao.State;
 import com.Technion.ie.dao.V_Vector;
@@ -17,6 +18,7 @@ public class ViterbiAlg extends Exception {
 	private List<String> sentence;
 	private State[] tags;
 	private V_Vector vParameter;
+	private Feature fParameter;
 	
 	public ViterbiAlg (List<String> sentence , State[] tags, V_Vector v)
 	{
@@ -29,6 +31,13 @@ public class ViterbiAlg extends Exception {
 	{
 		this.tags = tags;
 		this.vParameter = v;
+	}
+	
+	public ViterbiAlg (State[] tags, V_Vector v, Feature f)
+	{
+		this.tags = tags;
+		this.vParameter = v;
+		this.fParameter = f;
 	}
 	
 	public int[] viterbi() {

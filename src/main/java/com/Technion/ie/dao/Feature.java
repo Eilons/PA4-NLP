@@ -11,6 +11,7 @@ public class Feature extends Parameter {
 	
 	public static String FEATURE_TRIGRAM_FORMAT = "TRIGRAM:%s:%s:%s";
 	public static String FEATURE_TAG_FORMAT = "TAG:%s:%s";
+	public static String FEATURE_SUFF_FORMAT = "SUFF:%s:%s";
 
 	
 	public Feature()
@@ -50,11 +51,49 @@ public class Feature extends Parameter {
 				String wordTagPair = string[0]+":"+string[1];
 				if (!words.contains(wordTagPair)) {
 						words.add(wordTagPair);
-						this.mapParameter.put(wordTagPair, 1.0);
+	            		String key = (String.format(FEATURE_TAG_FORMAT,
+								string[0],string[1]));
+						this.mapParameter.put(key, 1.0);
+				}
+			}
+		}
+		//SUFF FEATURE
+		Set<String> suff = new HashSet<String>();//keep all Suffix:Tags - acts like cach
+		for (String data : trainingData)
+		{
+			String[] string = Utils.splitToTokens(data);
+			int endIndex = string[0].length();
+			if (endIndex > 0) {
+				String subString = string[0].substring(endIndex-1, endIndex);
+				if (!suff.contains(subString)) {
+					suff.add(subString+":"+string[1]);
+					String key = (String.format(FEATURE_SUFF_FORMAT,
+							subString,string[1])); 
+					this.mapParameter.put(key, 1.0);
+				}
+			}
+			if (endIndex > 1) {
+				String subString = string[0].substring(endIndex-2, endIndex);
+				if (!suff.contains(subString)) {
+					suff.add(subString+":"+string[1]);
+					String key = (String.format(FEATURE_SUFF_FORMAT,
+							subString,string[1])); 
+					this.mapParameter.put(key, 1.0);
+				}
+			}
+			if (endIndex > 2) {
+				String subString = string[0].substring(endIndex-3, endIndex);
+				if (!suff.contains(subString)) {
+					suff.add(subString+":"+string[1]);
+					String key = (String.format(FEATURE_SUFF_FORMAT,
+							subString,string[1])); 
+					this.mapParameter.put(key, 1.0);
 				}
 			}
 		}
 	}
+	
+	
 	
 
 }

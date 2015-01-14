@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.Technion.ie.Utils.Utils;
+import com.Technion.ie.dao.Feature;
 import com.Technion.ie.dao.State;
 import com.Technion.ie.dao.V_Vector;
 import com.Technion.ie.ViterbiAlg.ViterbiAlg;
@@ -13,13 +14,16 @@ import com.Technion.ie.ViterbiAlg.ViterbiAlg;
 public class BaseLine {
 	
 	public static final String TAG_MODEL = "c:\\H4p-NLP\\tag.model";
+	public static final String GENE_TRAIN = "c:\\H4p-NLP\\gene.train";
 	public static final String GENE_DEV = "c:\\H4p-NLP\\gene.dev";
 	public static final String GENE_DEV_P1_OUT = "/c:/h4p-NLP/gene_dev.p1.out";
 	
 	public void part1 () throws IOException
 	{
 		V_Vector v = new V_Vector();
+		Feature f = new Feature ();
 		v.initalizeFromFile(TAG_MODEL);
+		f.initalizeFromFile(GENE_TRAIN);
 		State[] tags = {State.I_GENE, State.O };
 		
 		//read sentences
