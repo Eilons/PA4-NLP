@@ -38,6 +38,34 @@ public class Feature extends Parameter {
             	}
             }
         }
+        
+        for (int u=0; u< tags.length; u++)
+        {
+    		String key = (String.format(FEATURE_TRIGRAM_FORMAT,
+					"*","*",State.getStateFromId(u)));
+    		this.mapParameter.put(key, 1.0);
+        }
+        
+        for (int u=0; u< tags.length; u++)
+        {
+        	for (int v=0; v< tags.length; v++)
+        	{
+        		String key = (String.format(FEATURE_TRIGRAM_FORMAT,
+    					"*",State.getStateFromId(u),State.getStateFromId(v)));
+        		this.mapParameter.put(key, 1.0);
+        	}
+        }
+        
+        for (int u=0; u< tags.length; u++)
+        {
+        	for (int v=0; v< tags.length; v++)
+        	{
+        		String key = (String.format(FEATURE_TRIGRAM_FORMAT,
+    					State.getStateFromId(u),State.getStateFromId(v),"STOP"));
+        		this.mapParameter.put(key, 1.0);
+        	}
+        }
+        
         //TAG FEATURE
         Set<String> words = new HashSet<String> ();//keep all seeing words:Tags - acts like cache
         //read from word files...
@@ -66,31 +94,29 @@ public class Feature extends Parameter {
 			if (endIndex > 0) {
 				String subString = string[0].substring(endIndex-1, endIndex);
 				if (!suff.contains(subString)) {
-					suff.add(subString+":"+string[1]);
-					String key = (String.format(FEATURE_SUFF_FORMAT,
-							subString,string[1])); 
-					this.mapParameter.put(key, 1.0);
+					createSuffFeature(suff, string, subString);
 				}
 			}
 			if (endIndex > 1) {
 				String subString = string[0].substring(endIndex-2, endIndex);
 				if (!suff.contains(subString)) {
-					suff.add(subString+":"+string[1]);
-					String key = (String.format(FEATURE_SUFF_FORMAT,
-							subString,string[1])); 
-					this.mapParameter.put(key, 1.0);
+					createSuffFeature(suff, string, subString);
 				}
 			}
 			if (endIndex > 2) {
 				String subString = string[0].substring(endIndex-3, endIndex);
 				if (!suff.contains(subString)) {
-					suff.add(subString+":"+string[1]);
-					String key = (String.format(FEATURE_SUFF_FORMAT,
-							subString,string[1])); 
-					this.mapParameter.put(key, 1.0);
+					createSuffFeature(suff, string, subString);
 				}
 			}
 		}
+	}
+
+	private void createSuffFeature(Set<String> suff, String[] string, String subString) {
+		suff.add(subString+":"+string[1]);
+		String key = (String.format(FEATURE_SUFF_FORMAT,
+				subString,string[1])); 
+		this.mapParameter.put(key, 1.0);
 	}
 	
 	

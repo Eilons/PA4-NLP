@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.Technion.ie.dao.State;
 
@@ -98,5 +100,29 @@ public class Utils {
  
  		System.out.println("Saving parameters to file...DONE"); 
  	}
+	
+	public static void writeVectorParameterToTxt (String path , HashMap<String,Double> v_parameter)
+	{
+		System.out.println("Saving V parameters to file..."); 
+ 		try { 
+ 			BufferedWriter wr = new BufferedWriter (new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));			 	 
+ 			for(Entry<String, Double> entry : v_parameter.entrySet()) { 
+ 				
+ 				String key = entry.getKey();
+ 				Double value = entry.getValue();
+ 				 
+ 				wr.write(key + " " + value); 
+ 				wr.newLine(); 
+ 				wr.flush(); 
+ 			} 
+ 			wr.close(); 
+ 		} 
+ 		catch(Exception ex) { 
+ 			System.out.println("Error while trying to write parameter file: " + ex.toString()); 
+ 		} 
+ 
+ 
+ 		System.out.println("Saving parameters to file...DONE"); 
+	}
 
 }

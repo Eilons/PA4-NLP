@@ -2,8 +2,9 @@ package com.Technion.ie.dao;
 
 public enum State {
 	
-	I_GENE("I-GENE", 0),
-    O("O", 1);
+	O("O", 0),
+	I_GENE("I-GENE", 1);
+    
 	
     private String name;
     private int id;
@@ -25,10 +26,10 @@ public enum State {
     public static State getStateFromId(int id) {
         switch (id) {
             case 0:
-                return I_GENE;
+                return O;
 
             case 1:
-                return O;
+                return I_GENE;
         }
         
         throw new IllegalArgumentException("Unrecognised state id : " + id);

@@ -9,7 +9,9 @@ public class RunExperiments {
 	public static void main(String[] args) throws IOException {
 		
 		BaseLine baseline = new BaseLine();
-		baseline.part1();
+		//baseline.part1();
+		//baseline.perceptron();
+		baseline.part2();
 		
 		
 
