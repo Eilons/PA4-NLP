@@ -19,6 +19,8 @@ public class BaseLine {
 	public static final String GENE_DEV_P1_OUT = "/c:/h4p-NLP/gene_dev.p1.out";
 	public static final String SUFFIX_TAGGER_OUT = "/c:/h4p-NLP/suffix_tagger.model";
 	public static final String GENE_DEV_P2_OUT = "/c:/h4p-NLP/gene_dev.p2.out";
+	public static final String GENE_DEV_P3_OUT = "/c:/h4p-NLP/gene_dev.p3.out";
+	public static final int PART = 3;
 	
 	public void part1 () throws IOException
 	{
@@ -36,7 +38,7 @@ public class BaseLine {
 		for (List<String> sentence : sentnecesList) 
 		{
 			viterbi.setSentece(sentence);
-			int[] res = viterbi.viterbi(1);
+			int[] res = viterbi.viterbi(PART);
 			resultList.add(res);
 		}
 		
@@ -52,7 +54,7 @@ public class BaseLine {
 		List<String> trainingData = Utils.readFile(GENE_TRAIN);
 		List<List<String>> sentnecesList = Utils.createSentences(trainingData);
 		ViterbiAlg viterbi = new ViterbiAlg (tags, sentnecesList );
-		viterbi.perceptron(2);
+		viterbi.perceptron(PART);
 		Utils.writeVectorParameterToTxt(SUFFIX_TAGGER_OUT, viterbi.getV());
 		
 	}
@@ -73,11 +75,35 @@ public class BaseLine {
 		for (List<String> sentence : sentnecesList) 
 		{
 			viterbi.setSentece(sentence);
-			int[] res = viterbi.viterbi(2);
+			int[] res = viterbi.viterbi(PART);
 			resultList.add(res);
 		}
 		
 		Utils.writeViterbiResultsToTxt(resultList,sentnecesList,GENE_DEV_P2_OUT);
+	
+	}
+	
+	public void part3() throws IOException
+	{
+		V_Vector v = new V_Vector();
+		v.initalizeFromFile(SUFFIX_TAGGER_OUT);
+		State[] tags = {State.O, State.I_GENE };
+		
+		//read sentences
+		List<String> devSentncesList = Utils.readFile(GENE_DEV);
+		List<List<String>> sentnecesList = Utils.createSentences(devSentncesList);
+		
+		//Viterbi
+		List<int[]> resultList = new ArrayList<int[]>();
+		ViterbiAlg viterbi = new ViterbiAlg (tags, v); 
+		for (List<String> sentence : sentnecesList) 
+		{
+			viterbi.setSentece(sentence);
+			int[] res = viterbi.viterbi(PART);
+			resultList.add(res);
+		}
+		
+		Utils.writeViterbiResultsToTxt(resultList,sentnecesList,GENE_DEV_P3_OUT);
 	
 	}
 

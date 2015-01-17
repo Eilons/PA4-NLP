@@ -20,6 +20,7 @@ public class ViterbiAlg extends Exception {
 	public static String FEATURE_TRIGRAM_FORMAT = "TRIGRAM:%s:%s:%s";
 	public static String FEATURE_TAG_FORMAT = "TAG:%s:%s";
 	public static String FEATURE_SUFF_FORMAT = "SUFF:%s:%s";
+	public static String FEATURE_PRE_FORMAT = "PRE:%s:%s";
 	public static int ITERATION = 5;
 	
 	private List<String> sentence;
@@ -170,7 +171,7 @@ public class ViterbiAlg extends Exception {
     	
     	String keyTag = String.format(FEATURE_TAG_FORMAT, h.getCurrentWord(), v);
 		
-    	if (part == 2)
+    	if (part == 2 || part == 3)
 		{
 			List<String> trimWord = suff (h.getCurrentWord());
 			for (String trim : trimWord) {
@@ -182,6 +183,18 @@ public class ViterbiAlg extends Exception {
 				}
 			}
 		}
+    	if (part == 3)
+    	{
+			List<String> trimWord = pre (h.getCurrentWord());
+			for (String trim : trimWord) {
+				
+				String keyPre = String.format(FEATURE_PRE_FORMAT, trim, v);
+		    	if (this.vParameter.getMapParameter().containsKey(keyPre))
+				{
+		    		score += this.vParameter.getMapParameter().get(keyPre);
+				}
+			}
+    	}
     	
     	
     	if (this.vParameter.getMapParameter().containsKey(keyTrigram))
@@ -214,6 +227,27 @@ public class ViterbiAlg extends Exception {
 		
 		return trim;
 	}
+	
+	private List<String> pre (String currentWord)
+	{
+		List<String> trim = new ArrayList<String>();
+		int endIndex = currentWord.length();
+		if (endIndex > 0) {
+			String subString = currentWord.substring(0, 1);
+			trim.add(subString);
+			}
+		if (endIndex > 1) {
+			String subString = currentWord.substring(0, 2);
+			trim.add(subString);
+			}
+		if (endIndex > 2) {
+			String subString = currentWord.substring(0, 3);
+			trim.add(subString);
+			}
+		
+		return trim;
+	}
+	
 
 	//return vParamter trained using Training samples
     public void perceptron (int part)
@@ -240,43 +274,47 @@ public class ViterbiAlg extends Exception {
 				bestTagging.add(State.getStateFromId(tag).getName());
 			}
     		//part 2 + 3
-    			bestFeatureKeys = getKeyFeatures(getSentnece(), bestTagging);
-    			goldFeatureKeys = getKeyFeatures(getSentnece(), tagSentnece);
+    			bestFeatureKeys = getKeyFeatures(getSentnece(), bestTagging, part);
+    			goldFeatureKeys = getKeyFeatures(getSentnece(), tagSentnece, part);
     		// part 4
-    			for (String key : goldFeatureKeys) {
-					
-    				if (this.vParameter.getMapParameter().containsKey(key))
-    				{
-    					double value = this.vParameter.getMapParameter().get(key);
-    					value = (bestFeatureKeys.contains(key)) ? value : value + 1.0;
-    					this.vParameter.setMapParameter(key, value);
-    				}
-    				else
-    				{
-    					double value = 0.0;
-    					value = (bestFeatureKeys.contains(key)) ? value : value + 1.0;
-    					this.vParameter.setMapParameter(key, value);
-    				}
-				}
-    			for (String key : bestFeatureKeys) {
-					
-    				if (this.vParameter.getMapParameter().containsKey(key))
-    				{
-    					double value = this.vParameter.getMapParameter().get(key);
-    					value = (goldFeatureKeys.contains(key)) ? value : value - 1.0;
-    					this.vParameter.setMapParameter(key, value);
-    				}
-    				else
-    				{
-    					double value = 0.0;
-    					value = (goldFeatureKeys.contains(key)) ? value : value - 1.0;
-    					this.vParameter.setMapParameter(key, value);
-    				}
-				}
+    			updateVScores(bestFeatureKeys, goldFeatureKeys);
     		}
     	}
     	 
     }
+
+	private void updateVScores(List<String> bestFeatureKeys, List<String> goldFeatureKeys) {
+		for (String key : goldFeatureKeys) {
+			
+			if (this.vParameter.getMapParameter().containsKey(key))
+			{
+				double value = this.vParameter.getMapParameter().get(key);
+				value = (bestFeatureKeys.contains(key)) ? value : value + 1.0;
+				this.vParameter.setMapParameter(key, value);
+			}
+			else
+			{
+				double value = 0.0;
+				value = (bestFeatureKeys.contains(key)) ? value : value + 1.0;
+				this.vParameter.setMapParameter(key, value);
+			}
+		}
+		for (String key : bestFeatureKeys) {
+			
+			if (this.vParameter.getMapParameter().containsKey(key))
+			{
+				double value = this.vParameter.getMapParameter().get(key);
+				value = (goldFeatureKeys.contains(key)) ? value : value - 1.0;
+				this.vParameter.setMapParameter(key, value);
+			}
+			else
+			{
+				double value = 0.0;
+				value = (goldFeatureKeys.contains(key)) ? value : value - 1.0;
+				this.vParameter.setMapParameter(key, value);
+			}
+		}
+	}
     
     private void separateTagWord (List<String> wordSentence, List<String> tagSentence, List<String> trainSentence)
     {
@@ -293,7 +331,7 @@ public class ViterbiAlg extends Exception {
      * @param tagList
      * @return all keys realted for features of the current sentnece and tagList
      */
-    private List<String> getKeyFeatures (List<String> sentnece, List<String> tagList)
+    private List<String> getKeyFeatures (List<String> sentnece, List<String> tagList, int part)
     {
     	//Set<String> keysSet = new HashSet<String>();
     	List<String> keysList = new ArrayList<String>();
@@ -304,13 +342,29 @@ public class ViterbiAlg extends Exception {
     		//keysSet.addAll(SuffKeys(sentence.get(i), tagList.get(i)));
     		keysList.add(TrigramKeys(i,tagList,sentenceLength));
     		keysList.add(TagKeys(sentnece.get(i), tagList.get(i)));
-    		keysList.addAll(SuffKeys(sentence.get(i), tagList.get(i)));
+    		keysList.addAll(SuffKeys(sentnece.get(i), tagList.get(i)));
+    		if (part == 3)
+    		{
+    			keysList.addAll(PreKeys(sentnece.get(i), tagList.get(i)));
+    		}
 		}
     	//For STOP case - only affect trigram
     	//keysSet.add(TrigramKeys(sentenceLength,tagList,sentenceLength));
     	//keysList.addAll(keysSet);
     	keysList.add(TrigramKeys(sentenceLength,tagList,sentenceLength));
     	return keysList;
+    }
+    
+    private List<String> PreKeys (String word, String tag)
+    {
+    	List<String> trimList = pre(word);
+    	List<String> key = new ArrayList<String>();
+    	for (String trim : trimList) {
+    		String keySuff = String.format(FEATURE_PRE_FORMAT, trim, tag);
+    		key.add(keySuff);
+		}
+    	
+    	return key;
     }
     
     private List<String> SuffKeys (String word, String tag)

@@ -11,7 +11,8 @@ public class RunExperiments {
 		BaseLine baseline = new BaseLine();
 		//baseline.part1();
 		//baseline.perceptron();
-		baseline.part2();
+		//baseline.part2();
+		baseline.part3();
 		
 		
 
