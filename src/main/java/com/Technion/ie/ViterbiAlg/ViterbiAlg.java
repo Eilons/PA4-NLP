@@ -29,6 +29,11 @@ public class ViterbiAlg extends Exception {
 	private V_Vector vParameter;
 	private Feature fParameter;
 	
+	public ViterbiAlg ()
+	{
+		
+	}
+	
 	public ViterbiAlg (List<String> sentence , State[] tags, V_Vector v)
 	{
 		this.sentence = sentence;
